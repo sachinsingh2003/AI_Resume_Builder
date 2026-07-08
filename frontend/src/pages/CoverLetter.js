@@ -66,7 +66,7 @@ export default function CoverLetter() {
               {result.key_matches?.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-white/5">
                   <div className="text-xs uppercase tracking-widest text-zinc-500 mb-2">Key matches</div>
-                  <ul className="list-disc ml-5 text-sm text-zinc-400">{result.key_matches.map((k, i) => <li key={i}>{k}</li>)}</ul>
+                  <ul className="list-disc ml-5 text-sm text-zinc-400">{result.key_matches.map((k) => <li key={k}>{k}</li>)}</ul>
                 </div>
               )}
             </div>

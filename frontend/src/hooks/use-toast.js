@@ -143,7 +143,9 @@ function useToast() {
         listeners.splice(index, 1)
       }
     };
-  }, [state])
+    // setState is stable and `listeners` is a module-level array — this
+    // subscription should mount/unmount exactly once. Empty deps intentional.
+  }, [])
 
   return {
     ...state,

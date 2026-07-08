@@ -1,5 +1,5 @@
 /** Job Tracker — kanban across pipeline stages. */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, ExternalLink, Kanban } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
@@ -20,8 +20,15 @@ export default function JobTracker() {
   const [form, setForm] = useState(emptyForm());
   const [editing, setEditing] = useState(null);
 
-  const load = () => api.get("/jobs").then(r => setJobs(r.data)).catch(() => {});
-  useEffect(() => { load(); }, []);
+  const load = useCallback(async () => {
+    try {
+      const r = await api.get("/jobs");
+      setJobs(r.data);
+    } catch (e) {
+      console.warn("Failed to load jobs:", e?.message);
+    }
+  }, []);
+  useEffect(() => { load(); }, [load]);
 
   const submit = async () => {
     if (!form.company || !form.role) { toast.error("Company and role required"); return; }

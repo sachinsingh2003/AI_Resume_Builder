@@ -1,5 +1,5 @@
 /** Dashboard home — quick stats + shortcuts to modules. */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FileText, Scan, MessageSquare, Kanban, ArrowUpRight, Compass, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -20,9 +20,16 @@ export default function DashboardHome() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
 
-  useEffect(() => {
-    api.get("/dashboard/summary").then(r => setStats(r.data)).catch(() => setStats({}));
+  const loadStats = useCallback(async () => {
+    try {
+      const r = await api.get("/dashboard/summary");
+      setStats(r.data);
+    } catch {
+      setStats({});
+    }
   }, []);
+
+  useEffect(() => { loadStats(); }, [loadStats]);
 
   return (
     <div>

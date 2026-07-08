@@ -15,6 +15,8 @@ export default function Profile() {
   const [form, setForm] = useState({ name: "", phone: "", location: "", headline: "", linkedin: "", website: "", bio: "" });
   const [busy, setBusy] = useState(false);
 
+  // Populate the form when the authenticated user is loaded.
+  // setForm is stable; the functional updater lets us safely omit `f` from deps.
   useEffect(() => {
     if (user) setForm((f) => ({ ...f, name: user.name || "", ...user }));
   }, [user]);

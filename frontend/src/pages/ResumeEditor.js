@@ -28,8 +28,12 @@ export default function ResumeEditor() {
   const timerRef = useRef(null);
   const skipFirst = useRef(true);
 
+  // Load the resume once per :id. api, toast, formatApiError are module-level
+  // (stable) so we intentionally scope deps to [id].
   useEffect(() => {
+    let cancelled = false;
     api.get(`/resumes/${id}`).then((r) => {
+      if (cancelled) return;
       setTitle(r.data.title || "Untitled");
       setTemplate(r.data.template || "modern");
       setData({
@@ -38,9 +42,11 @@ export default function ResumeEditor() {
         ...(r.data.data || {}),
       });
     }).catch(e => toast.error(formatApiError(e.response?.data?.detail) || e.message));
+    return () => { cancelled = true; };
   }, [id]);
 
-  // autosave
+  // Autosave: debounce a PUT 800ms after any state change. Skip the very first
+  // effect run (right after initial load) to avoid immediately writing back.
   useEffect(() => {
     if (!data) return;
     if (skipFirst.current) { skipFirst.current = false; return; }
@@ -49,8 +55,11 @@ export default function ResumeEditor() {
       try {
         setSaving(true);
         await api.put(`/resumes/${id}`, { title, template, data });
-      } catch (e) { toast.error("Autosave failed"); }
-      finally { setSaving(false); }
+      } catch {
+        toast.error("Autosave failed");
+      } finally {
+        setSaving(false);
+      }
     }, 800);
     return () => clearTimeout(timerRef.current);
   }, [title, template, data, id]);
@@ -187,6 +196,22 @@ function Field({ label, value, onChange, testId }) {
   );
 }
 
+function ResumeExperienceItem({ item }) {
+  // useMemo avoids re-splitting the bullet text on every parent render.
+  const bullets = useMemo(
+    () => (item.bullets || "").split("\n").filter(Boolean).map((text, idx) => ({ id: `${item.id}-b-${idx}`, text })),
+    [item.bullets, item.id]
+  );
+  return (
+    <div className="mt-3">
+      <div className="flex justify-between"><span className="font-semibold">{item.role} · {item.company}</span><span className="text-xs text-zinc-600">{item.start} – {item.end}</span></div>
+      <ul className="list-disc ml-5 mt-1 text-sm leading-relaxed">
+        {bullets.map((b) => <li key={b.id}>{b.text}</li>)}
+      </ul>
+    </div>
+  );
+}
+
 function ResumePreview({ data, template }) {
   const compact = template === "compact";
   const classic = template === "classic";
@@ -204,14 +229,7 @@ function ResumePreview({ data, template }) {
       {data.summary && <section className="mt-6"><h3 className="font-bold uppercase text-sm tracking-widest">Summary</h3><p className="mt-2 leading-relaxed">{data.summary}</p></section>}
       {(data.experiences || []).length > 0 && (
         <section className="mt-6"><h3 className="font-bold uppercase text-sm tracking-widest">Experience</h3>
-          {data.experiences.map((x) => (
-            <div key={x.id} className="mt-3">
-              <div className="flex justify-between"><span className="font-semibold">{x.role} · {x.company}</span><span className="text-xs text-zinc-600">{x.start} – {x.end}</span></div>
-              <ul className="list-disc ml-5 mt-1 text-sm leading-relaxed">
-                {(x.bullets || "").split("\n").filter(Boolean).map((b, i) => <li key={i}>{b}</li>)}
-              </ul>
-            </div>
-          ))}
+          {data.experiences.map((x) => <ResumeExperienceItem key={x.id} item={x} />)}
         </section>
       )}
       {(data.education || []).length > 0 && (

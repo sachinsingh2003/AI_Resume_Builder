@@ -1,6 +1,6 @@
 /** Interview Preparation — generate role-tailored questions across categories.
  * Persists sessions per user (visible under history). */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { MessageSquare, ChevronDown } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
@@ -25,8 +25,15 @@ export default function InterviewPrep() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
 
-  const loadHistory = () => api.get("/interview/history").then((r) => setHistory(r.data)).catch(() => {});
-  useEffect(() => { loadHistory(); }, []);
+  const loadHistory = useCallback(async () => {
+    try {
+      const r = await api.get("/interview/history");
+      setHistory(r.data);
+    } catch (e) {
+      console.warn("Failed to load interview history:", e?.message);
+    }
+  }, []);
+  useEffect(() => { loadHistory(); }, [loadHistory]);
 
   const generate = async () => {
     if (!role.trim()) { toast.error("Enter a target role"); return; }
@@ -116,7 +123,7 @@ export default function InterviewPrep() {
               </div>
               <Accordion type="multiple" data-testid="interview-questions">
                 {result.questions.map((q, i) => (
-                  <AccordionItem key={i} value={`q-${i}`} className="border-white/8">
+                  <AccordionItem key={q.question || `q-${i}`} value={`q-${i}`} className="border-white/8">
                     <AccordionTrigger data-testid={`q-trigger-${i}`} className="hover:no-underline text-left">
                       <span className="flex gap-3">
                         <span className="font-mono-alt text-zinc-500">{String(i + 1).padStart(2, "0")}</span>
@@ -131,7 +138,7 @@ export default function InterviewPrep() {
                         {q.evaluation_criteria?.length > 0 && (
                           <div className="mt-4">
                             <div className="text-xs uppercase tracking-widest text-zinc-500 mb-2">Evaluation criteria</div>
-                            <ul className="list-disc ml-5 text-sm">{q.evaluation_criteria.map((c, j) => (<li key={j}>{c}</li>))}</ul>
+                            <ul className="list-disc ml-5 text-sm">{q.evaluation_criteria.map((c) => (<li key={c}>{c}</li>))}</ul>
                           </div>
                         )}
                       </div>

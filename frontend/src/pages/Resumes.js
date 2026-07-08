@@ -1,5 +1,5 @@
 /** Resumes list — create/delete + open editor. */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Plus, Trash2, FileText } from "lucide-react";
@@ -12,8 +12,15 @@ export default function Resumes() {
   const [loading, setLoading] = useState(true);
   const nav = useNavigate();
 
-  const load = () => api.get("/resumes").then(r => setItems(r.data)).finally(() => setLoading(false));
-  useEffect(() => { load(); }, []);
+  const load = useCallback(async () => {
+    try {
+      const r = await api.get("/resumes");
+      setItems(r.data);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useEffect(() => { load(); }, [load]);
 
   const create = async () => {
     try {

@@ -66,9 +66,9 @@ export default function CareerAdvisor() {
                 <Card title="Roadmap">
                   <div className="space-y-4">
                     {result.roadmap.map((s, i) => (
-                      <div key={i}>
+                      <div key={`stage-${s.stage || i}`}>
                         <div className="font-mono-alt text-xs text-zinc-500">{s.stage}</div>
-                        <ul className="list-disc ml-5 text-sm text-zinc-300 mt-1">{(s.actions || []).map((a, j) => <li key={j}>{a}</li>)}</ul>
+                        <ul className="list-disc ml-5 text-sm text-zinc-300 mt-1">{(s.actions || []).map((a) => <li key={a}>{a}</li>)}</ul>
                       </div>
                     ))}
                   </div>
@@ -78,12 +78,12 @@ export default function CareerAdvisor() {
                 <Card title="Skill gaps"><div className="flex flex-wrap gap-2">{result.skill_gaps.map((s) => <Badge key={s} variant="outline" className="border-yellow-500/30 text-yellow-200">{s}</Badge>)}</div></Card>
               )}
               {result.recommended_certifications?.length > 0 && (
-                <Card title="Certifications"><ul className="list-disc ml-5 text-sm">{result.recommended_certifications.map((c, i) => <li key={i}>{c}</li>)}</ul></Card>
+                <Card title="Certifications"><ul className="list-disc ml-5 text-sm">{result.recommended_certifications.map((c) => <li key={c}>{c}</li>)}</ul></Card>
               )}
               {result.learning_resources?.length > 0 && (
                 <Card title="Learning">
                   <ul className="text-sm space-y-2">
-                    {result.learning_resources.map((r, i) => (<li key={i}><b>{r.title}</b> <span className="text-zinc-500">— {r.url_or_source}</span></li>))}
+                    {result.learning_resources.map((r) => (<li key={`${r.title}-${r.url_or_source}`}><b>{r.title}</b> <span className="text-zinc-500">— {r.url_or_source}</span></li>))}
                   </ul>
                 </Card>
               )}

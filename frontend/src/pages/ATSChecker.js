@@ -1,5 +1,5 @@
 /** ATS Checker — paste resume + optional JD, get score + suggestions. */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Scan, CheckCircle2, AlertTriangle, Upload } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
@@ -17,8 +17,15 @@ export default function ATSChecker() {
   const [busy, setBusy] = useState(false);
   const [history, setHistory] = useState([]);
 
-  const loadHistory = () => api.get("/ats/history").then((r) => setHistory(r.data)).catch(() => {});
-  useEffect(() => { loadHistory(); }, []);
+  const loadHistory = useCallback(async () => {
+    try {
+      const r = await api.get("/ats/history");
+      setHistory(r.data);
+    } catch (e) {
+      console.warn("Failed to load ATS history:", e?.message);
+    }
+  }, []);
+  useEffect(() => { loadHistory(); }, [loadHistory]);
 
   const analyze = async () => {
     if (!resumeText.trim()) { toast.error("Paste your resume text first"); return; }
@@ -130,7 +137,7 @@ export default function ATSChecker() {
                 <div className="p-6 rounded-lg border border-white/8 bg-white/[0.02]">
                   <div className="text-xs uppercase tracking-widest text-zinc-500 mb-3">Suggestions</div>
                   <ul className="space-y-2 text-sm text-zinc-300">
-                    {result.improvement_suggestions.map((s, i) => (<li key={i} className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" /> {s}</li>))}
+                    {result.improvement_suggestions.map((s) => (<li key={s} className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" /> {s}</li>))}
                   </ul>
                 </div>
               )}
@@ -138,7 +145,7 @@ export default function ATSChecker() {
                 <div className="p-6 rounded-lg border border-orange-500/20 bg-orange-500/5">
                   <div className="text-xs uppercase tracking-widest text-orange-300 mb-3">Formatting issues</div>
                   <ul className="space-y-2 text-sm text-orange-100">
-                    {result.formatting_issues.map((s, i) => (<li key={i} className="flex gap-2"><AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" /> {s}</li>))}
+                    {result.formatting_issues.map((s) => (<li key={s} className="flex gap-2"><AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" /> {s}</li>))}
                   </ul>
                 </div>
               )}
