@@ -1,0 +1,116 @@
+{
+  "typography": {
+    "strategy": "Swiss Brutalist (Tech/SaaS)",
+    "headings": {
+      "font": "Cabinet Grotesk, sans-serif",
+      "style": "Radical weight contrast (Black vs Light). Do not use Inter for headings.",
+      "tracking": "tracking-tighter"
+    },
+    "body": {
+      "font": "Inter, sans-serif",
+      "style": "Clean geometric body for max legibility."
+    },
+    "scale": {
+      "H1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter leading-none",
+      "H2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight",
+      "H3": "text-xl sm:text-2xl",
+      "body": "text-base leading-relaxed text-zinc-400"
+    }
+  },
+  "colors": {
+    "archetype": "SWISS & HIGH-CONTRAST + THE PERFORMANCE PRO (Linear Style)",
+    "theme": "Dark Mode Default with High Impact Minimalist aesthetics.",
+    "palette": {
+      "base": "#050505",
+      "surface": "#111111",
+      "border": "rgba(255, 255, 255, 0.1)",
+      "primary": "#FFFFFF",
+      "accent": "#007AFF",
+      "muted": "#A1A1AA"
+    },
+    "rules": "No generic full-screen gradients. Tint neutral greys with a slight blue/cool tone. Never use pure black #000000. Text must meet APCA standards."
+  },
+  "visual enhancers": {
+    "glassmorphism": "bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] (The Crystal variant)",
+    "borders": "1px solid stroke (border-white/10) to define sections. Remove soft shadows in dark mode, use inner glows.",
+    "textures": "Include a subtle noise/grain overlay div covering the background.",
+    "tracing_beam": "Use on high-conversion cards (Pricing) with shimmering borders."
+  },
+  "component name": {
+    "strategy": "Shadcn UI base, heavily customized for Linear/SaaS aesthetic.",
+    "button": "Sharp rectangular or fully pill-shaped. Primary uses pure white bg with black text, or accent blue.",
+    "card": "Cardless or max 8px border-radius. Use 'Grid Borders' approach.",
+    "form": "Shadcn Form elements. Never native inputs.",
+    "toast": "Use sonner for notifications."
+  },
+  "grids": {
+    "dashboard": "High Density Grid (Data Correlation). Base: grid-cols-1 md:grid-cols-3 lg:grid-cols-4. Gap: tight (gap-4).",
+    "marketing": "The Bento Grid Protocol (Tetris style) for features. Asymmetric spans (col-span-8, col-span-4). Wide gaps (gap-8).",
+    "alignment": "Left-align dense text/labels. Mobile-first grid-cols-1."
+  },
+  "layouts": {
+    "spacing": "Generous Spacing: p-6, p-8, p-12. Containers with borders MUST have internal padding.",
+    "hero": "One-column layout, massive H1, sticky CTA, glassmorphic header.",
+    "pricing": "Linear-style one column flow with 3 distinct card tiers and a clean monthly/annual toggle.",
+    "dashboard_sidebar": "Sticky left sidebar (w-64), solid background, subtle right border."
+  },
+  "motion": {
+    "micro_interactions": "Hover states must lift (-translate-y-1) or alter border color (border-white/30).",
+    "entrance": "Staggered fade-up (Framer Motion: initial {opacity:0, y:20}).",
+    "technical": "Use explicit transitions: transition-transform transition-colors duration-200 ease-out. Exclude transforms from universal transitions."
+  },
+  "accessibility": {
+    "contrast": "Minimum 4.5:1 for normal text. NEVER rely on inheritance for hover states.",
+    "focus": "High contrast focus states: focus-visible:ring-2 focus-visible:ring-blue-500.",
+    "motion": "Respect prefers-reduced-motion via CSS."
+  },
+  "media": {
+    "strategy": "Limit photography to essential moments (testimonials/interviews). Rely on typographic hierarchy and geometry for visual interest.",
+    "overlay": "If images are used in backgrounds, apply bg-black/60 to ensure text readability."
+  },
+  "3d libraries": {
+    "recommendation": "Use TSParticles for a subtle floating mesh network background in the hero section to simulate AI capability. Keep it low opacity (10%)."
+  },
+  "image urls": [
+    {
+      "url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMHdvcmtpbmclMjBsYXB0b3B8ZW58MHx8fHwxNzgzNTE5OTU3fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Professional woman with laptop",
+      "category": "Testimonials / Career Advisor Avatar"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1698047682091-782b1e5c6536?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHwxfHxvZmZpY2UlMjBpbnRlcnZpZXclMjBtZWV0aW5nfGVufDB8fHx8MTc4MzUxOTk1N3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Two women shaking hands in office",
+      "category": "Interview Preparation Feature Card"
+    }
+  ],
+  "instructions_to_main_agent": [
+    "Build the application using React (.js/.jsx) + Tailwind CSS. DO NOT USE Typescript (.ts/.tsx).",
+    "Apply dark theme explicitly or by wrapping the main layout in a .dark class container.",
+    "Use lucide-react or @phosphor-icons/react for all icons and mock company logos.",
+    "Implement the layout with pure Tailwind CSS grid and flex utilities. Do not center everything. Left-align text for readability.",
+    "Ensure the dashboard features an ATS Resume Checker, Interview Prep, and Resume Builder per requirements.",
+    "Use Framer Motion for entrance animations (lazy-loaded to keep bundle size low).",
+    "For the Landing page pricing section, use a clean 3-tier Linear-style card layout with a monthly/annual toggle.",
+    "Ensure all interactive and key informational elements MUST include a data-testid attribute (kebab-case, role-based) for automated testing."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN. Use typographic logos instead if images are not provided.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Create new components that match the style and conventions of existing components when needed.",
+    "Use sonner for toasts, located in /app/frontend/src/components/ui/sonner.js.",
+    "DO NOT use complete transparent background in header, overlays, any surface that has content under it. Example: Dropdown with transparent background.",
+    "All interactive and key informational elements MUST include a data-testid attribute."
+  ]
+}
