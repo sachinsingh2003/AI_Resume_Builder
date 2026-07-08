@@ -1,0 +1,20 @@
+/** Small routes constants + testids for consistency across the app. */
+export const ROUTES = {
+  landing: "/",
+  login: "/login",
+  register: "/register",
+  forgot: "/forgot-password",
+  reset: "/reset-password",
+  terms: "/terms",
+  privacy: "/privacy",
+  contact: "/contact",
+  dashboard: "/dashboard",
+  resumes: "/dashboard/resumes",
+  ats: "/dashboard/ats",
+  interview: "/dashboard/interview",
+  cover: "/dashboard/cover-letter",
+  career: "/dashboard/career",
+  jobs: "/dashboard/jobs",
+  profile: "/dashboard/profile",
+  settings: "/dashboard/settings",
+};

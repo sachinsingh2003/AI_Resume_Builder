@@ -1,0 +1,39 @@
+{
+  "summary": "Backend (18/18 pytest tests pass after fix) + frontend smoke tested. Auth flows, resumes CRUD, ATS analyze/upload/history, interview gen/history, cover-letter, career advice, jobs CRUD, profile, dashboard summary, 401 guards, brute-force lockout, forgot/reset password all verified. Fixed a critical naive-vs-aware datetime bug in server.py that broke brute-force lockout (500 on 6th attempt) and password reset (500). Frontend register->dashboard flow works; all 8 dashboard routes render without crashes; protected /dashboard redirects to /login when unauth.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/ats/analyze (and other AI endpoints)", "issue": "Intermittent LLM budget-exceeded response from litellm: 'Budget has been exceeded! Current cost: 0.0, Max budget: 0.0'. Endpoint still returned 200 but body was {'error': ...}. On retry all AI endpoints returned valid JSON. Monitor EMERGENT_LLM_KEY quota."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Landing/Login", "issues": ["Console errors show 401 from /api/auth/me on public pages (AuthContext calls me() on mount even when unauthenticated). Non-blocking but noisy — consider suppressing 401 for anonymous page loads."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Monitor EMERGENT_LLM_KEY budget — some AI calls got 'Budget has been exceeded' error inconsistently. Retries succeeded, so quota may be throttling.",
+    "(Optional) Silence /api/auth/me 401 noise in console for public pages — AuthContext should skip me() if no token indicator or catch 401 silently."
+  ],
+  "critical_code_review_comments": [
+    "FIXED by testing agent: MongoDB motor client was not tz_aware=True, so datetimes stored as tz-aware UTC came back naive. Any `>` / `<` comparison (login_attempts.locked_until, password_reset_tokens.expires_at) raised TypeError -> 500. Fix: `AsyncIOMotorClient(..., tz_aware=True)` in /app/backend/server.py.",
+    "server.py is ~640 lines — approaching threshold; consider splitting into routers/auth.py, routers/resumes.py, routers/ats.py, etc. for maintainability.",
+    "CORS is set to '*' with allow_credentials=True — browsers reject credentials with wildcard. It works today because REACT_APP_BACKEND_URL == same origin as frontend (both served via ingress), so cookies are same-site. If used cross-origin later, set CORS_ORIGINS explicitly.",
+    "Cookie `secure=False` — acceptable for HTTPS-terminated ingress in dev; set to True in production behind HTTPS.",
+    "ai_service errors are wrapped and returned as 200 with {'error': ...}. Consider returning 503 so frontend can retry/show 'AI temporarily unavailable' state."
+  ],
+  "updated_files": [
+    "/app/backend/server.py (added tz_aware=True to AsyncIOMotorClient)",
+    "/app/backend/tests/backend_test.py (new comprehensive pytest suite)"
+  ],
+  "success_rate": {"backend": "100% (18/18)", "frontend": "smoke passed"},
+  "test_credentials": "admin@careerforge.ai/Admin@123, test@careerforge.ai/Test@1234 — both work.",
+  "seed_data_creation": "Tests create their own TEST_ prefixed users/resumes/jobs. No manual seed needed.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend suite lives at /app/backend/tests/backend_test.py — run with `pytest backend/tests/backend_test.py -v`. Requires REACT_APP_BACKEND_URL env. Uses parallel workers (2). AI endpoints have 90s timeout; may occasionally return 200 with {'error': budget exceeded} — acceptable per spec. Datetime tz fix is in place; do NOT remove tz_aware=True from motor client.",
+  "rca of the issue": "TypeError: can't compare offset-naive and offset-aware datetimes. Server code used datetime.now(timezone.utc) (aware) when storing/comparing, but PyMongo/Motor by default deserialize BSON datetimes as naive Python datetimes. Comparing them (`la['locked_until'] > now`, `rec['expires_at'] < now`) raised TypeError -> uncaught -> 500. Reproduction: 6 bad login attempts -> 6th returns 500 instead of 429; POST /api/auth/reset-password with valid token -> 500. Mitigation applied: pass tz_aware=True to AsyncIOMotorClient. Post-fix: brute-force returns 429 and reset-password returns 200 as expected."
+}
