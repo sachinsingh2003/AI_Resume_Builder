@@ -117,6 +117,25 @@ class TestAuth:
         r = s2.post(f"{API}/auth/login", json={"email": e, "password": new_pw}, timeout=STD_TIMEOUT)
         assert r.status_code == 200
 
+    def test_session_anonymous_returns_200_null(self):
+        s = requests.Session()  # no cookies
+        r = s.get(f"{API}/auth/session", timeout=STD_TIMEOUT)
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert "user" in data
+        assert data["user"] is None
+
+    def test_session_authenticated_returns_user(self):
+        s = requests.Session()
+        e, p, n = _mk_user()
+        r = s.post(f"{API}/auth/register", json={"email": e, "password": p, "name": n}, timeout=STD_TIMEOUT)
+        assert r.status_code == 200
+        r = s.get(f"{API}/auth/session", timeout=STD_TIMEOUT)
+        assert r.status_code == 200
+        data = r.json()
+        assert data["user"] is not None
+        assert data["user"]["email"] == e.lower()
+
     def test_unauth_endpoints_return_401(self):
         s = requests.Session()  # no cookies
         for path in ["/auth/me", "/resumes", "/ats/history", "/interview/history", "/jobs", "/dashboard/summary"]:

@@ -12,14 +12,15 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch current user on mount / after auth actions.
+  // Fetch current session on mount. Uses /auth/session (always 200) instead
+  // of /auth/me (401 when unauth) so DevTools stays quiet on public pages.
   // Empty dep array is correct: api/setUser/setLoading are stable references.
   const fetchMe = useCallback(async () => {
     try {
-      const { data } = await api.get("/auth/me");
-      setUser(data.user);
+      const { data } = await api.get("/auth/session");
+      setUser(data.user || null);
     } catch {
-      // 401 on public pages is expected — treat as anonymous session.
+      // Network-level failure — treat as anonymous.
       setUser(null);
     } finally {
       setLoading(false);
